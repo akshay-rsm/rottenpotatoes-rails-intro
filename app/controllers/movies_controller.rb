@@ -10,13 +10,13 @@ class MoviesController < ApplicationController
     
   end
 
-  def index
+  def index         # Execute when page is loaded
     @all_ratings = Movie.send_all_ratings
-    @sort = params[:sort] || session[:sort]
-    session[:ratings] = session[:ratings] || {"G" => "", "PG" => "","PG-13" => "","R" => ""}
+    @sort = params[:sort] || session[:sort]       #sort parameter
+    session[:ratings] = session[:ratings] || @all_ratings
     @sel_param = params[:ratings] || session[:ratings]
     session[:sort] = @sort
-    session[:ratings] = @sel_param
+    session[:ratings] = Hash[@sel_param]        #make hash of selected ratings to iterate over keys
     @movies = Movie.where(rating: session[:ratings].keys).order(session[:sort])
     if(params[:sort].nil? and !(session[:sort].nil?)) or (params[:ratings].nil? and !(session[:ratings].nil?))
       flash.keep
