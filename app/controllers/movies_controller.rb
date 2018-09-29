@@ -18,7 +18,7 @@ class MoviesController < ApplicationController
     session[:sort] = @sort
     session[:ratings] = Hash[@sel_param]        #make hash of selected ratings to iterate over keys
     @movies = Movie.where(rating: session[:ratings].keys).order(session[:sort])
-    if(params[:sort].nil? and !(session[:sort].nil?)) or (params[:ratings].nil? and !(session[:ratings].nil?))
+    if((params[:sort] != session[:sort]) or (params[:ratings] != session[:ratings]))
       flash.keep
       redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
     end
