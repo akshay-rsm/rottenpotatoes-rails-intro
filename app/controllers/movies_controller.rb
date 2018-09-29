@@ -11,17 +11,20 @@ class MoviesController < ApplicationController
   end
 
   def index         # Execute when page is loaded
-    @all_ratings = Movie.send_all_ratings
-    @sort = params[:sort] || session[:sort]       #sort parameter
-    session[:ratings] = session[:ratings] || @all_ratings
-    @sel_param = params[:ratings] || session[:ratings]
-    session[:sort] = @sort
-    session[:ratings] = Hash[@sel_param]        #make hash of selected ratings to iterate over keys
-    @movies = Movie.where(rating: session[:ratings].keys).order(session[:sort])
-    if((params[:sort] != session[:sort]) or (params[:ratings] != session[:ratings]))
+    
+    session[:sort] = params[:sort] if params[:sort]
+    session[:ratings] = params[:ratings] if params[:ratings]
+    @title = 'hilite' if session[:sort] == 'title'
+    @release_date = 'hilite' if session[:sort] == 'release_date'
+
+    if session[:sort] != params[:sort] || session[:ratings] != params[:ratings]
       flash.keep
-      redirect_to movies_path(sort: session[:sort], ratings: session[:ratings])
+      redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings])
     end
+
+    @all_ratings = Movie.send_all_ratings
+    @sel_ratings = session[:ratings].nil? ? @all_ratings : session[:ratings].keys
+    @movies = Movie.where(:rating => @sel_ratings).order(session[:sort])
   end
   
   def new
